@@ -1,0 +1,29 @@
+version: '2'
+
+volumes:
+  nextcloud:
+  db:
+
+services:
+  db:
+    image: mariadb
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    restart: always
+    volumes:
+      - /data/local/nextcloud/db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_PASSWORD=
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+
+  app:
+    image: nextcloud
+    links:
+      - db
+    volumes:
+      - /data/local/nextcloud/data:/var/www/html
+    restart: always
+    labels:
+      - "traefik.router.rule=Host:office.tillwitt.de"
+      - traefik.port=8080
